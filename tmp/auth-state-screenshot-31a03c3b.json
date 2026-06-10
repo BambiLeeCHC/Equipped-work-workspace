@@ -1,0 +1,22 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:4173",
+      "localStorage": [
+        {
+          "name": "theme",
+          "value": "light"
+        },
+        {
+          "name": "__convexAuthRefreshToken_httpsrapidmeerkat668convexcloud",
+          "value": "jd788hgg00s2hffwvzqjsz2kj5882yd1|jh7eyzkjx1kavzas4pqd3sfznx8826ms"
+        },
+        {
+          "name": "__convexAuthJWT_httpsrapidmeerkat668convexcloud",
+          "value": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJqeDcxNm5ua2JzaHYweWJ5Z3RmY2hlejJiaDg4MDdtN3xqaDdleXprangxa2F2emFzNHBxZDNzZnpueDg4MjZtcyIsImlhdCI6MTc4MDYyNTY1NiwiaXNzIjoiaHR0cHM6Ly9yYXBpZC1tZWVya2F0LTY2OC5jb252ZXguc2l0ZSIsImF1ZCI6ImNvbnZleCIsImV4cCI6MTc4MDYyOTI1Nn0.Yfs0k27v3byqJ-XCWkbzZNsjvkMZngrSjeCJL_fiP48sC7m80jU87rFvKG2XeYuUd_INGSAkjq8O77SnBSO0HNZj_HSI5Q425erWlu3f-5auyBfQpdJW_FUkdWs4oCt4joEumCzhMzg1PHa2l6jeackxqKBANzE6SxVyTo4SEHbJcowb-VgiwXfH_mslRpZOi3eGtJH7k5vOxVPFwtRbriMJ0FQ7grxk9UVIy8WYv95bTGyVn01ltf8TGO-5EcQfAU4f2_T1SUia9L1L2Ejps_qoU9qKwo7yqS3_SfFtpqhcqe8Oefq1ApLO5fD1qjyUlyeztvQNbSnQBo-TKZSstQ"
+        }
+      ]
+    }
+  ]
+}

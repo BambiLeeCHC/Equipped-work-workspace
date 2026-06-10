@@ -1,0 +1,306 @@
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Menu, X, Building2, LogOut, Shield,
+  FileText, ChevronDown, CreditCard, ExternalLink,
+} from "lucide-react";
+import { api } from "../../convex/_generated/api";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { BrandMark } from "./WorkspaceLogo";
+
+/**
+ * Workspace hamburger-style navbar — mirrors Work's TopNavbar
+ * but scoped to workspace pages. Shows "Admin Dashboard" only
+ * when logged in as a platform admin.
+ */
+export function WorkspaceNavbar() {
+  const user = useQuery(api.auth.currentUser);
+  const isAdmin = useQuery(api.admin.isAdmin);
+  const { signOut } = useAuthActions();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const mainLinks = [
+    { href: "/workspace", label: "Workspaces", icon: Building2 },
+    { href: "/workspace-pricing", label: "Pricing", icon: CreditCard },
+    ...(isAdmin ? [{ href: "/admin", label: "Admin Dashboard", icon: Shield }] : []),
+  ];
+
+  const legalLinks = [
+    { href: "/workspace-legal/terms", label: "Terms" },
+    { href: "/workspace-legal/privacy", label: "Privacy" },
+    { href: "/workspace-legal/refund", label: "Refunds" },
+  ];
+
+  return (
+    <>
+      {/* ── STICKY NAVBAR — dark glass (cyan accent) ── */}
+      <nav
+        className="sticky top-0 z-50 w-full border-b border-white/[0.06]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(8,8,14,0.97) 0%, rgba(12,12,20,0.95) 100%)",
+          backdropFilter: "blur(20px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+        }}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex h-14 items-center justify-between gap-4">
+            {/* Left: Logo + Links */}
+            <div className="flex items-center gap-5">
+              <Link to="/workspace" className="flex items-center gap-2.5 shrink-0">
+                <div className="size-8 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-md shadow-cyan-500/20">
+                  <Building2 className="text-white w-4 h-4" />
+                </div>
+                <span className="hidden sm:inline">
+                  <BrandMark variant="workspace" />
+                </span>
+              </Link>
+
+              {/* Desktop links — pill-style buttons */}
+              <div className="hidden md:flex items-center gap-1.5">
+                {mainLinks.map((link) => {
+                  const active =
+                    location.pathname === link.href ||
+                    (link.href === "/admin" && location.pathname.startsWith("/admin")) ||
+                    (link.href === "/workspace" && location.pathname === "/workspace");
+                  const Icon = link.icon;
+                  return (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 border ${
+                        active
+                          ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-sm shadow-cyan-500/10"
+                          : "text-gray-400 border-transparent hover:text-gray-200 hover:bg-white/[0.06] hover:border-white/[0.08]"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {link.label}
+                    </Link>
+                  );
+                })}
+
+                {/* Cross-link to Work */}
+                <Link
+                  to="/work"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-500 border border-transparent hover:text-gray-300 hover:bg-white/[0.06] hover:border-white/[0.08] transition-all duration-200"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span className="text-xs">Work</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Profile + Hamburger */}
+            <div className="flex items-center gap-2">
+              {/* Desktop profile dropdown */}
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-transparent hover:bg-white/[0.06] hover:border-white/[0.08] transition-all duration-200"
+                >
+                  <Avatar className="size-7">
+                    <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-teal-600 text-white text-xs font-bold">
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium max-w-[120px] truncate text-gray-300">
+                    {user?.name || "User"}
+                  </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-gray-500 transition-transform ${
+                      profileOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {profileOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
+                    <div
+                      className="absolute right-0 top-full mt-2 w-56 z-50 rounded-xl border border-white/[0.08] shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, rgba(18,18,28,0.98) 0%, rgba(14,14,22,0.98) 100%)",
+                        backdropFilter: "blur(24px)",
+                      }}
+                    >
+                      {/* User info */}
+                      <div
+                        className="px-3 py-2.5 border-b border-white/[0.06]"
+                        style={{ background: "rgba(255,255,255,0.02)" }}
+                      >
+                        <p className="text-sm font-semibold truncate text-gray-200">
+                          {user?.name || "User"}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        {isAdmin && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/20">
+                            ADMIN
+                          </span>
+                        )}
+                      </div>
+                      {/* Links */}
+                      <div className="py-1">
+                        {isAdmin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                          >
+                            <Shield className="w-4 h-4 text-gray-500" /> Admin Dashboard
+                          </Link>
+                        )}
+                        <Link
+                          to="/work"
+                          onClick={() => setProfileOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-gray-300 hover:bg-white/[0.06] hover:text-white transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4 text-gray-500" /> E-Quipped: Work
+                        </Link>
+                      </div>
+                      {/* Legal links */}
+                      <div className="border-t border-white/[0.06] py-1">
+                        <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-600">
+                          Legal
+                        </p>
+                        {legalLinks.map((l) => (
+                          <Link
+                            key={l.href}
+                            to={l.href}
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-1.5 text-xs text-gray-500 hover:text-gray-300 hover:bg-white/[0.06] transition-colors"
+                          >
+                            {l.label}
+                          </Link>
+                        ))}
+                      </div>
+                      {/* Sign out */}
+                      <div className="border-t border-white/[0.06] py-1">
+                        <button
+                          onClick={() => signOut()}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile hamburger */}
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="md:hidden p-2 rounded-xl border border-transparent hover:bg-white/[0.06] hover:border-white/[0.08] transition-all"
+              >
+                {mobileOpen ? (
+                  <X className="w-5 h-5 text-gray-300" />
+                ) : (
+                  <Menu className="w-5 h-5 text-gray-300" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile menu — dark sheet */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 top-14 z-40 border-t border-white/[0.06] animate-in fade-in slide-in-from-top-2 duration-200 overflow-y-auto"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(8,8,14,0.98) 0%, rgba(6,6,12,0.99) 100%)",
+            backdropFilter: "blur(24px)",
+          }}
+        >
+          <div className="p-4 space-y-1">
+            {/* User card */}
+            <div
+              className="flex items-center gap-3 p-3 rounded-xl border border-white/[0.06] mb-4"
+              style={{ background: "rgba(255,255,255,0.03)" }}
+            >
+              <Avatar className="size-10">
+                <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-teal-600 text-white text-sm font-bold">
+                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-sm text-gray-200">
+                  {user?.name || "User"}
+                </p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+                {isAdmin && (
+                  <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/15 text-cyan-400">
+                    ADMIN
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Main nav */}
+            {mainLinks.map((link) => {
+              const active = location.pathname === link.href;
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all border ${
+                    active
+                      ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/30"
+                      : "text-gray-400 border-transparent hover:bg-white/[0.06] hover:border-white/[0.08] hover:text-gray-200"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" /> {link.label}
+                </Link>
+              );
+            })}
+
+            {/* Cross-link to Work */}
+            <Link
+              to="/work"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-gray-500 border border-transparent hover:bg-white/[0.06] hover:border-white/[0.08] hover:text-gray-300"
+            >
+              <ExternalLink className="w-5 h-5" /> E-Quipped: Work
+            </Link>
+
+            {/* Legal */}
+            <div className="pt-4 mt-4 border-t border-white/[0.06]">
+              <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-600 mb-1">
+                Legal
+              </p>
+              {legalLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  to={l.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-500 hover:text-gray-300 hover:bg-white/[0.06] transition-colors"
+                >
+                  <FileText className="w-4 h-4" /> {l.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Sign out */}
+            <div className="pt-4 mt-4 border-t border-white/[0.06]">
+              <button
+                onClick={() => signOut()}
+                className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10"
+              >
+                <LogOut className="w-5 h-5" /> Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
